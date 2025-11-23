@@ -1,5 +1,5 @@
-const express = require('express');z
-const connectDB = require('./config/database');
+const express = require('express');
+const connectDB = require('./config/MONGO_URI');
 const routes = require('./routes');
 
 const app = express();
