@@ -1,6 +1,5 @@
 const RangoEdad = require("../models/RangoEdad");
 
-// Obtener todos los rangos
 exports.obtenerRangos = async (req, res) => {
     try {
         const rangos = await RangoEdad.find();
@@ -17,7 +16,6 @@ exports.obtenerRangos = async (req, res) => {
     }
 };
 
-// Obtener un rango por ID
 exports.obtenerRangoPorId = async (req, res) => {
     try {
         const rango = await RangoEdad.findById(req.params.id);
@@ -40,7 +38,6 @@ exports.obtenerRangoPorId = async (req, res) => {
     }
 };
 
-// Crear un nuevo rango
 exports.crearRango = async (req, res) => {
     try {
         const { descripcion, edadMinima, edadMaxima } = req.body;
@@ -80,7 +77,6 @@ exports.crearRango = async (req, res) => {
     }
 };
 
-// Actualizar un rango
 exports.actualizarRango = async (req, res) => {
     try {
         const { descripcion, edadMinima, edadMaxima } = req.body;
@@ -119,7 +115,6 @@ exports.actualizarRango = async (req, res) => {
     }
 };
 
-// Eliminar un rango
 exports.eliminarRango = async (req, res) => {
     try {
         const rango = await RangoEdad.findByIdAndDelete(req.params.id);
