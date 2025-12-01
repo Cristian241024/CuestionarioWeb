@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const usuarioSchema = new mongoose.Schema(
     {
@@ -7,7 +8,7 @@ const usuarioSchema = new mongoose.Schema(
             type: String,
             required: [true, "El nombre es requerido"],
             trim: true,
-            minlength: [2, "El nombre debe tener mínimo 2 caracteres"],
+            minlength: [3, "El nombre debe tener mínimo 3 caracteres"],
             maxlength: [50, "El nombre no puede exceder 50 caracteres"]
         },
         email: {
@@ -27,6 +28,7 @@ const usuarioSchema = new mongoose.Schema(
             type: String,
             required: [true, "La contraseña es requerida"],
             minlength: [6, "La contraseña debe tener mínimo 6 caracteres"],
+            maxlength:[50,"La contraseña no debe exceder 50 caracteres"],
             select: false  // No incluir en queries por defecto
         },
         rol: {
@@ -72,11 +74,20 @@ usuarioSchema.methods.compararPassword = async function(passwordIngresado) {
 };
 
 // Método para generar JWT (placeholder para Etapa 2)
+usuarioSchema.methods.compararPassword = async function(passwordIngresado) {
+    return await bcrypt.compare(passwordIngresado, this.password);
+};
 // La Persona 2 implementará este método cuando agregue JWT
 usuarioSchema.methods.generarToken = function() {
-    // TODO: Implementar JWT en Etapa 2
-    // Este método será completado por la Persona 2
-    return null;
+    return jwt.sign(
+        { 
+            id: this._id, 
+            email: this.email, 
+            rol: this.rol 
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRE }
+    );
 };
 
 // Índices para mejorar consultas
