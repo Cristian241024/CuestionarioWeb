@@ -5,15 +5,15 @@ const rangoEdadRoutes = require('./rangoEdadRoutes');
 const dificultadRoutes = require('./dificultadRoutes');
 const categoriaRoutes = require('./categoriaRoutes');
 const subcategoriaRoutes = require('./subcategoriaRoutes');
-const { verificarToken, verificarAdmin } = require("../middlewares/autenticacion");
+const { verificarToken } = require("../middlewares/autenticacion");
 
 router.use("/auth", authRoutes);
 
-// Rutas protegidas
+// Rutas - Las protecciones están DENTRO de cada archivo de rutas
 router.use('/rangos-edad', rangoEdadRoutes);
 router.use('/dificultad', dificultadRoutes);
-router.use('/categorias', verificarToken, verificarAdmin, categoriaRoutes);
-router.use('/subcategorias', verificarToken, verificarAdmin, subcategoriaRoutes);
+router.use('/categorias', categoriaRoutes);  // Sin verificarToken aquí, las GET son públicas
+router.use('/subcategorias', subcategoriaRoutes);  // Sin verificarToken aquí, las GET son públicas
 
 // Ruta de prueba
 router.get('/test', (req, res) => {

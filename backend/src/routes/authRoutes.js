@@ -1,13 +1,15 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/authController");
-const { verificarToken } = require("../middlewares/autenticacion");
+const { verificarToken, soloAdminRegistra } = require("../middlewares/autenticacion");
 
-// Rutas públicas
-router.post("/registro", authController.registro);
+// REGISTRO: Solo admin o primer usuario
+router.post("/registro", soloAdminRegistra, authController.registro);
+
+// LOGIN: Cualquiera registrado
 router.post("/login", authController.login);
 
-// Rutas protegidas
+// PERFIL: Solo autenticado
 router.get("/mi-perfil", verificarToken, authController.miPerfil);
 
 module.exports = router;

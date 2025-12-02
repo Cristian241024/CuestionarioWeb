@@ -4,7 +4,6 @@ const Usuario = require("../models/Usuario");
 // Middleware para verificar JWT
 exports.verificarToken = async (req, res, next) => {
     try {
-        // Obtener token del header
         const token = req.headers.authorization?.split(" ")[1];
 
         if (!token) {
@@ -14,10 +13,7 @@ exports.verificarToken = async (req, res, next) => {
             });
         }
 
-        // Verificar y decodificar token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-        // Obtener usuario del token
         const usuario = await Usuario.findById(decoded.id);
         
         if (!usuario) {
@@ -27,7 +23,6 @@ exports.verificarToken = async (req, res, next) => {
             });
         }
 
-        // Agregar usuario al request
         req.usuario = usuario;
         next();
     } catch (error) {
@@ -59,4 +54,45 @@ exports.verificarProfesor = (req, res, next) => {
         });
     }
     next();
+};
+
+// NUEVO: Solo ADMIN puede registrar usuarios
+exports.soloAdminRegistra = async (req, res, next) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+
+        // Si no hay token, es el primer registro (primer admin)
+        if (!token) {
+            // Verificar si ya existen usuarios en la BD
+            const usuariosExistentes = await Usuario.findOne();
+            if (usuariosExistentes) {
+                return res.status(403).json({
+                    success: false,
+                    message: "Solo el ADMIN puede registrar nuevos usuarios. Contacta al administrador."
+                });
+            }
+            // Es el primer usuario, permitir
+            return next();
+        }
+
+        // Si hay token, verificar que es ADMIN
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const usuario = await Usuario.findById(decoded.id);
+        
+        if (usuario.rol !== "ADMINISTRADOR") {
+            return res.status(403).json({
+                success: false,
+                message: "Acceso denegado. Solo administradores pueden registrar usuarios"
+            });
+        }
+
+        req.usuario = usuario;
+        next();
+    } catch (error) {
+        return res.status(403).json({
+            success: false,
+            message: "Acceso denegado",
+            error: error.message
+        });
+    }
 };
