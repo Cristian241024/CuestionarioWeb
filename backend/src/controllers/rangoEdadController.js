@@ -42,7 +42,7 @@ exports.crearRango = async (req, res) => {
     try {
         const { descripcion, edadMinima, edadMaxima } = req.body;
 
-        if (!descripcion || !edadMinima || !edadMaxima) {
+        if (!descripcion || edadMinima === undefined || edadMaxima === undefined) {
             return res.status(400).json({
                 success: false,
                 message: "Todos los campos son requeridos"
@@ -56,6 +56,34 @@ exports.crearRango = async (req, res) => {
             });
         }
 
+        const duplicado = await RangoEdad.findOne({
+            edadMinima,
+            edadMaxima
+        });
+
+        if (duplicado) {
+            return res.status(400).json({
+                success: false,
+                message: "Este rango de edad ya existe"
+            });
+        }
+
+        const solapado = await RangoEdad.findOne({
+            $or: [
+                {
+                    edadMinima: { $lte: edadMaxima },
+                    edadMaxima: { $gte: edadMinima }
+                }
+            ]
+        });
+
+        if (solapado) {
+            return res.status(400).json({
+                success: false,
+                message: `El rango se solapa con el existente: ${solapado.edadMinima}-${solapado.edadMaxima}`
+            });
+        }
+
         const nuevoRango = new RangoEdad({
             descripcion,
             edadMinima,
@@ -63,11 +91,13 @@ exports.crearRango = async (req, res) => {
         });
 
         await nuevoRango.save();
+
         res.status(201).json({
             success: true,
             message: "Rango de edad creado exitosamente",
             data: nuevoRango
         });
+
     } catch (error) {
         res.status(500).json({
             success: false,
