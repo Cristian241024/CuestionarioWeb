@@ -34,4 +34,8 @@ const subcategoriaSchema = new mongoose.Schema(
 subcategoriaSchema.index({ id_categoria: 1 });
 subcategoriaSchema.index({ activo: 1 });
 
+// Índice compuesto único: nombre_subcategoria + id_categoria
+// Esto permite el mismo nombre en diferentes categorías, pero no duplicados en la misma
+subcategoriaSchema.index({ nombre_subcategoria: 1, id_categoria: 1 }, { unique: true });
+
 module.exports = mongoose.model("Subcategoria", subcategoriaSchema);
