@@ -96,3 +96,53 @@ exports.soloAdminRegistra = async (req, res, next) => {
         });
     }
 };
+
+// Middleware para verificar que el usuario es PROFESOR o ADMINISTRADOR
+exports.verificarProfesorOAdmin = (req, res, next) => {
+    if (!["PROFESOR", "ADMINISTRADOR"].includes(req.usuario.rol)) {
+        return res.status(403).json({
+            success: false,
+            message: "Acceso denegado. Solo profesores o administradores"
+        });
+    }
+    next();
+};
+
+// Middleware para verificar que el usuario es propietario de la pregunta o ADMINISTRADOR
+exports.verificarPropietarioOAdmin = async (req, res, next) => {
+    try {
+        const Pregunta = require("../models/Pregunta");
+        const pregunta = await Pregunta.findById(req.params.id);
+
+        if (!pregunta) {
+            return res.status(404).json({
+                success: false,
+                message: "Pregunta no encontrada"
+            });
+        }
+
+        // Admin puede modificar cualquier pregunta
+        if (req.usuario.rol === "ADMINISTRADOR") {
+            req.pregunta = pregunta;
+            return next();
+        }
+
+        // Profesor solo puede modificar sus propias preguntas
+        if (req.usuario.rol === "PROFESOR" && 
+            pregunta.id_profesor.toString() === req.usuario._id.toString()) {
+            req.pregunta = pregunta;
+            return next();
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: "No tienes permiso para modificar esta pregunta"
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Error al verificar permisos",
+            error: error.message
+        });
+    }
+};
