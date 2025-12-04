@@ -100,6 +100,14 @@ exports.crearCategoria = async (req, res) => {
             data: nuevaCategoria
         });
     } catch (error) {
+        // Manejo específico para error de duplicado
+        if (error.code === 11000) {
+            return res.status(400).json({
+                success: false,
+                message: "Ya existe una categoría con ese nombre"
+            });
+        }
+        
         res.status(500).json({
             success: false,
             message: "Error al crear categoría",

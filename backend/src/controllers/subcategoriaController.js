@@ -94,6 +94,14 @@ exports.crearSubcategoria = async (req, res) => {
             data: nuevaSubcategoria
         });
     } catch (error) {
+        // Manejo específico para error de duplicado
+        if (error.code === 11000) {
+            return res.status(400).json({
+                success: false,
+                message: "Ya existe una subcategoría con ese nombre en esta categoría"
+            });
+        }
+        
         res.status(500).json({
             success: false,
             message: "Error al crear subcategoría",
