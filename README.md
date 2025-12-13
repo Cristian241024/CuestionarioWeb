@@ -105,7 +105,12 @@ cd backend
 node generate-certs.js
 ```
 
-Esto creará los archivos `cert.pem` y `key.pem` en la carpeta `backend/certs/`.
+Esto crea automáticamente:
+
+- `certs/cert.pem`
+- `certs/key.pem`
+
+En la carpeta `backend/certs/`.
 
 ### 3. Configurar MongoDB
 
