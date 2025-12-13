@@ -109,15 +109,45 @@ Esto creará los archivos `cert.pem` y `key.pem` en la carpeta `backend/certs/`.
 
 ### 3. Configurar MongoDB
 
-Opción A: **MongoDB Atlas (Recomendado)**
+Paso 1: **MongoDB Atlas (Recomendado)**
+
 1. Crea una cuenta en [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
 2. Crea un nuevo cluster
 3. Configura un usuario de base de datos
-4. Obtén la cadena de conexión y actualiza `MONGO_URI` en `.env`
+   1. En el panel de MongoDB Atlas, ve a la sección izquierda
+   2. Haz clic en "Database Access" (Acceso a Base de Datos)
+   3. Haz clic en "+ Add New Database User" (Agregar nuevo usuario)
+   4. Completa los siguientes campos:
+   - Username: sanchezmaria2c_db_user (o el nombre que prefieras)
+   - Password: Haz clic en "Autogenerate Secure Password" para generar una contraseña segura
+   - Database User Privileges: Selecciona "Atlas admin" (o "Read and write to any database")
+   5. Copia la contraseña generada en un lugar seguro (la necesitarás después)
+   6. Haz clic en "Add User"
+4. Autorizar tu dirección IP
+   1. En el panel izquierdo, haz clic en "Network Access" (Acceso de Red)
+   2. Haz clic en "+ Add IP Address" (Agregar dirección IP)
+   3. Selecciona una opción:
+   - Opción A: Haz clic en "Add Current IP Address" para autorizar solo tu IP actual
+   - Opción B: En el campo de IP, ingresa 0.0.0.0/0 para permitir conexiones desde cualquier lugar (menos seguro, solo para desarrollo)
+   4. Haz clic en "Confirm"
+5. Obtener la cadena de conexión
+   1. En el panel de MongoDB Atlas, ve a "Databases" (Bases de Datos)
+   2. Haz clic en el botón "Connect" (Conectar) de tu cluster
+   3. Selecciona "Drivers" (Controladores)
+   4. Selecciona "Node.js" como lenguaje
+   5. Copia la cadena de conexión que aparece (se verá así):
+      mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority
+6. Actualizar el archivo `MONGO_URI` en `.env`
+   1. Abre el archivo .env en la raíz de tu proyecto
+   2. Reemplaza los valores en la cadena de conexión:
+   - Reemplaza <username> con tu usuario (ej: sanchezmaria2c_db_user)
+   - Reemplaza <password> con la contraseña que copiaste en el paso 3
+   - Agrega /CuestionarioDB antes de ? para especificar la base de datos
+   3. La cadena final debe verse así:
+      **MongoDB Local**
 
-Opción B: **MongoDB Local**
 ```env
-MONGO_URI=mongodb://localhost:27017/CuestionarioDB
+  MONGO_URI=mongodb+srv://sanchezmaria2c_db_user:TuPasswordSeguro123@cluster0.xxxxx.mongodb.net/CuestionarioDB?retryWrites=true&w=majority&appName=Cluster0
 ```
 
 ## 🎯 Uso
@@ -130,6 +160,7 @@ npm run dev
 ```
 
 El servidor se iniciará en:
+
 - HTTP: `http://localhost:4000`
 - HTTPS: `https://localhost:4443` (si generaste certificados)
 
@@ -283,23 +314,25 @@ POST   /api/rangos-edad       # Crear rango
 ```
 
 > **Nota**: Los endpoints protegidos requieren enviar el token JWT en el header:
+>
 > ```
 > Authorization: Bearer <token>
 > ```
 
+## 🧪 Guía de Pruebas con Postman
 
-## 🧪 Guía de Pruebas con Postman 
 Antes de realizar las pruebas necesarias verificar la configuracion de Postman en auto
 en settings/request/HTTP Version = auto
+
 ### 👥 Usuarios de Prueba
 
 Para probar la API, primero debes crear usuarios con diferentes roles. A continuación se muestran usuarios de ejemplo:
 
-| Rol | Email | Contraseña | Permisos |
-|-----|-------|------------|----------|
-| ADMINISTRADOR | admin@test.com | admin123 | Acceso total a todos los endpoints |
-| PROFESOR | profesor@test.com | profe123 | CRUD de sus propias preguntas y ciclos |
-| ESTUDIANTE | estudiante@test.com | estu123 | Solo lectura de contenido público |
+| Rol           | Email               | Contraseña | Permisos                               |
+| ------------- | ------------------- | ---------- | -------------------------------------- |
+| ADMINISTRADOR | admin@test.com      | admin123   | Acceso total a todos los endpoints     |
+| PROFESOR      | profesor@test.com   | profe123   | CRUD de sus propias preguntas y ciclos |
+| ESTUDIANTE    | estudiante@test.com | estu123    | Solo lectura de contenido público      |
 
 ### 📝 Paso a Paso: Configuración Inicial
 
@@ -308,11 +341,13 @@ Para probar la API, primero debes crear usuarios con diferentes roles. A continu
 **Endpoint:** `POST http://localhost:4000/api/auth/registro`
 
 **Headers:**
+
 ```
 Content-Type: application/json
 ```
 
 **Body (ejemplo para ADMIN):**
+
 ```json
 {
   "nombre": "Administrador Principal",
@@ -323,6 +358,7 @@ Content-Type: application/json
 ```
 
 **Body (ejemplo para PROFESOR):**
+
 ```json
 {
   "nombre": "Juan Pérez",
@@ -333,6 +369,7 @@ Content-Type: application/json
 ```
 
 **Body (ejemplo para ESTUDIANTE):**
+
 ```json
 {
   "nombre": "María García",
@@ -343,6 +380,7 @@ Content-Type: application/json
 ```
 
 **Respuesta esperada:**
+
 ```json
 {
   "success": true,
@@ -362,11 +400,13 @@ Content-Type: application/json
 **Endpoint:** `POST http://localhost:4000/api/auth/login`
 
 **Headers:**
+
 ```
 Content-Type: application/json
 ```
 
 **Body:**
+
 ```json
 {
   "email": "admin@test.com",
@@ -375,6 +415,7 @@ Content-Type: application/json
 ```
 
 **Respuesta esperada:**
+
 ```json
 {
   "success": true,
@@ -396,11 +437,13 @@ Content-Type: application/json
 Para endpoints protegidos, debes enviar el token en cada petición:
 
 **Opción 1: Header manual**
+
 ```
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 **Opción 2: En Postman (recomendado)**
+
 1. Ve a la pestaña **Authorization**
 2. Selecciona **Bearer Token**
 3. Pega tu token en el campo **Token**
@@ -410,6 +453,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 #### **Categorías**
 
 **Crear Categoría (requiere autenticación):**
+
 ```
 POST http://localhost:4000/api/categorias
 Authorization: Bearer <TOKEN_ADMIN>
@@ -422,11 +466,13 @@ Content-Type: application/json
 ```
 
 **Listar Categorías (público):**
+
 ```
 GET http://localhost:4000/api/categorias
 ```
 
 **Actualizar Categoría:**
+
 ```
 PUT http://localhost:4000/api/categorias/674abc123
 Authorization: Bearer <TOKEN_ADMIN>
@@ -440,6 +486,7 @@ Content-Type: application/json
 #### **Subcategorías**
 
 **Crear Subcategoría:**
+
 ```
 POST http://localhost:4000/api/subcategorias
 Authorization: Bearer <TOKEN_ADMIN>
@@ -453,6 +500,7 @@ Content-Type: application/json
 ```
 
 **Obtener Subcategorías por Categoría:**
+
 ```
 GET http://localhost:4000/api/subcategorias/categoria/674abc123
 ```
@@ -460,6 +508,7 @@ GET http://localhost:4000/api/subcategorias/categoria/674abc123
 #### **Preguntas**
 
 **Crear Pregunta (PROFESOR o ADMIN):**
+
 ```
 POST http://localhost:4000/api/preguntas
 Authorization: Bearer <TOKEN_PROFESOR>
@@ -476,6 +525,7 @@ Content-Type: application/json
 ```
 
 **Listar Preguntas:**
+
 - **Como ESTUDIANTE:** Solo ve preguntas publicadas
 - **Como PROFESOR:** Solo ve sus propias preguntas
 - **Como ADMIN:** Ve todas las preguntas
@@ -486,12 +536,14 @@ Authorization: Bearer <TOKEN>
 ```
 
 **Filtrar Preguntas:**
+
 ```
 GET http://localhost:4000/api/preguntas?estado=Publicada&tipo=Selección múltiple
 Authorization: Bearer <TOKEN>
 ```
 
 **Actualizar Pregunta (solo propietario o ADMIN):**
+
 ```
 PUT http://localhost:4000/api/preguntas/674abc123
 Authorization: Bearer <TOKEN_PROFESOR>
@@ -504,12 +556,14 @@ Content-Type: application/json
 ```
 
 **Publicar Pregunta:**
+
 ```
 PATCH http://localhost:4000/api/preguntas/674abc123/publicar
 Authorization: Bearer <TOKEN_PROFESOR>
 ```
 
 **Eliminar Pregunta:**
+
 ```
 DELETE http://localhost:4000/api/preguntas/674abc123
 Authorization: Bearer <TOKEN_ADMIN>
@@ -518,6 +572,7 @@ Authorization: Bearer <TOKEN_ADMIN>
 #### **Ciclos**
 
 **Crear Ciclo (solo ADMIN):**
+
 ```
 POST http://localhost:4000/api/ciclos
 Authorization: Bearer <TOKEN_ADMIN>
@@ -531,6 +586,7 @@ Content-Type: application/json
 ```
 
 **Listar Ciclos:**
+
 - **Como ADMIN:** Ve todos los ciclos (activos e inactivos)
 - **Como PROFESOR/ESTUDIANTE:** Solo ve ciclos activos
 
@@ -540,12 +596,14 @@ Authorization: Bearer <TOKEN>
 ```
 
 **Filtrar Ciclos Vigentes:**
+
 ```
 GET http://localhost:4000/api/ciclos?vigente=true
 Authorization: Bearer <TOKEN>
 ```
 
 **Actualizar Ciclo (solo ADMIN):**
+
 ```
 PUT http://localhost:4000/api/ciclos/674abc123
 Authorization: Bearer <TOKEN_ADMIN>
@@ -558,6 +616,7 @@ Content-Type: application/json
 ```
 
 **Desactivar Ciclo (solo ADMIN):**
+
 ```
 DELETE http://localhost:4000/api/ciclos/674abc123
 Authorization: Bearer <TOKEN_ADMIN>
@@ -566,6 +625,7 @@ Authorization: Bearer <TOKEN_ADMIN>
 #### **Dificultad**
 
 **Crear Nivel de Dificultad:**
+
 ```
 POST http://localhost:4000/api/dificultad
 Authorization: Bearer <TOKEN_ADMIN>
@@ -578,6 +638,7 @@ Content-Type: application/json
 ```
 
 **Listar Niveles:**
+
 ```
 GET http://localhost:4000/api/dificultad
 ```
@@ -585,6 +646,7 @@ GET http://localhost:4000/api/dificultad
 #### **Rangos de Edad**
 
 **Crear Rango de Edad:**
+
 ```
 POST http://localhost:4000/api/rangos-edad
 Authorization: Bearer <TOKEN_ADMIN>
@@ -598,6 +660,7 @@ Content-Type: application/json
 ```
 
 **Listar Rangos:**
+
 ```
 GET http://localhost:4000/api/rangos-edad
 ```
@@ -605,6 +668,7 @@ GET http://localhost:4000/api/rangos-edad
 ### 🎯 Permisos por Rol
 
 #### ADMINISTRADOR
+
 - ✅ Crear, editar, eliminar usuarios
 - ✅ Gestión completa de categorías y subcategorías
 - ✅ Ver, editar, eliminar preguntas de cualquier profesor
@@ -613,6 +677,7 @@ GET http://localhost:4000/api/rangos-edad
 - ✅ Acceso a estadísticas y reportes
 
 #### PROFESOR
+
 - ✅ Crear y editar sus propias preguntas
 - ✅ Ver solo sus preguntas (borradores + publicadas)
 - ✅ Publicar/despublicar sus preguntas
@@ -621,6 +686,7 @@ GET http://localhost:4000/api/rangos-edad
 - ❌ No puede crear/editar ciclos
 
 #### ESTUDIANTE
+
 - ✅ Ver preguntas publicadas
 - ✅ Ver categorías y subcategorías públicas
 - ✅ Ver ciclos activos
@@ -630,15 +696,15 @@ GET http://localhost:4000/api/rangos-edad
 
 ### 🔍 Códigos de Estado HTTP
 
-| Código | Significado |
-|--------|-------------|
-| 200 | Solicitud exitosa |
-| 201 | Recurso creado exitosamente |
-| 400 | Error en los datos enviados |
-| 401 | No autenticado (token inválido o faltante) |
-| 403 | No autorizado (sin permisos) |
-| 404 | Recurso no encontrado |
-| 500 | Error interno del servidor |
+| Código | Significado                                |
+| ------ | ------------------------------------------ |
+| 200    | Solicitud exitosa                          |
+| 201    | Recurso creado exitosamente                |
+| 400    | Error en los datos enviados                |
+| 401    | No autenticado (token inválido o faltante) |
+| 403    | No autorizado (sin permisos)               |
+| 404    | Recurso no encontrado                      |
+| 500    | Error interno del servidor                 |
 
 ### 💡 Consejos para Postman
 
@@ -684,8 +750,8 @@ Puedes importar todos estos endpoints creando un archivo JSON con la siguiente e
 - **Postman** - Testing de API (recomendado)
 
 ## 👤 Autor
+
 Proyecto desarrollado para el curso de Programación Web por:
+
 - **Huascar Cristian Cuellar Flores** -
 - **Maria Yesica Sanchez Calle** -
-
-
