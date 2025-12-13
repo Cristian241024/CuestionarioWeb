@@ -42,14 +42,23 @@ app.use((req, res, next) => {
 // Iniciar servidores
 const sslOptions = getSSLOptions();
 
-// Servidor HTTP (redirigir a HTTPS)
-http.createServer((req, res) => {
-  res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
-  res.end();
-}).listen(PORT, () => {
-  console.log(`🚀 Servidor HTTP corriendo en http://localhost:${PORT}`);
-  console.log(`   ➜ Redirige automáticamente a HTTPS\n`);
-});
+// Servidor HTTP
+if (sslOptions) {
+  // 🔁 Si HAY certificados → redirigir a HTTPS
+  http.createServer((req, res) => {
+    res.writeHead(301, {
+      Location: `https://${req.headers.host}${req.url}`
+    });
+    res.end();
+  }).listen(PORT, () => {
+    console.log(`🌐 HTTP activo en http://localhost:${PORT} (redirige a HTTPS)`);
+  });
+} else {
+  // 🌐 Si NO hay certificados → HTTP normal
+  http.createServer(app).listen(PORT, () => {
+    console.log(`🌐 Servidor HTTP corriendo en http://localhost:${PORT}`);
+  });
+}
 
 // Servidor HTTPS/HTTP2
 if (sslOptions) {
