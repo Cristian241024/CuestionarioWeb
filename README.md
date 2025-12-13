@@ -684,7 +684,8 @@ Puedes importar todos estos endpoints creando un archivo JSON con la siguiente e
 - **Postman** - Testing de API (recomendado)
 
 ## 👤 Autor
-
-Proyecto desarrollado para el curso de Programación Web
+Proyecto desarrollado para el curso de Programación Web por:
+- **Huascar Cristian Cuellar Flores** -
+- **Maria Yesica Sanchez Calle** -
 
 
