@@ -7,6 +7,7 @@ const categoriaRoutes = require('./categoriaRoutes');
 const subcategoriaRoutes = require('./subcategoriaRoutes');
 const preguntaRoutes = require('./preguntaRoutes');
 const cicloRoutes = require('./cicloRoutes');
+const respuestaRoutes = require('./respuestaRoutes');
 const { verificarToken } = require("../middlewares/autenticacion");
 
 router.use("/auth", authRoutes);
@@ -18,7 +19,7 @@ router.use('/categorias', categoriaRoutes);  // Sin verificarToken aquí, las GE
 router.use('/subcategorias', subcategoriaRoutes);  // Sin verificarToken aquí, las GET son públicas
 router.use('/preguntas', preguntaRoutes);  // Las protecciones están dentro de preguntaRoutes
 router.use('/ciclos', cicloRoutes);  // Las protecciones están dentro de cicloRoutes
-
+router.use('/respuestas', respuestaRoutes);
 // Ruta de prueba
 router.get('/test', (req, res) => {
     res.json({ message: '✅ Ruta de prueba funcionando' });
