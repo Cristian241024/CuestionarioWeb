@@ -214,6 +214,9 @@ CuestionarioWeb/
     │   │   ├── Categoria.js          # Categorías de preguntas
     │   │   ├── Subcategoria.js       # Subcategorías
     │   │   ├── Pregunta.js           # Preguntas del cuestionario
+    │   │   ├── Respuesta.js           # Respuestas de las preguntas
+    │   │   ├── Examen.js              # Exámenes
+    │   │   ├── ExamenPregunta.js      # Relación Examen - Preguntas
     │   │   ├── Ciclo.js              # Ciclos de cuestionarios
     │   │   ├── Dificultad.js         # Niveles de dificultad
     │   │   └── RangoEdad.js          # Rangos de edad
@@ -223,6 +226,8 @@ CuestionarioWeb/
     │   │   ├── categoriaController.js
     │   │   ├── subcategoriaController.js
     │   │   ├── preguntaController.js
+    │   │   ├── respuestaController.js # Gestión de respuestas
+    │   │   ├── examenController.js    # Gestión de exámenes
     │   │   ├── cicloController.js
     │   │   ├── dificultadController.js
     │   │   └── rangoEdadController.js
@@ -236,6 +241,8 @@ CuestionarioWeb/
     │       ├── categoriaRoutes.js    # /api/categorias
     │       ├── subcategoriaRoutes.js # /api/subcategorias
     │       ├── preguntaRoutes.js     # /api/preguntas
+    │       ├── respuestaRoutes.js    # /api/respuestas
+    │       ├── examenRoutes.js       # /api/examenes
     │       ├── cicloRoutes.js        # /api/ciclos
     │       ├── dificultadRoutes.js   # /api/dificultad
     │       └── rangoEdadRoutes.js    # /api/rangos-edad
@@ -316,6 +323,38 @@ POST   /api/dificultad        # Crear nivel
 ```
 GET    /api/rangos-edad       # Listar rangos
 POST   /api/rangos-edad       # Crear rango
+```
+
+### Respuestas
+
+```
+GET    /api/respuestas                         # Listar todas (requiere token)
+GET    /api/respuestas/:id                     # Obtener por ID (requiere token)
+GET    /api/respuestas/pregunta/:id_pregunta   # Obtener respuestas por pregunta (requiere token)
+GET    /api/respuestas/correcta/:id_pregunta   # Obtener respuesta correcta (público)
+
+POST   /api/respuestas                         # Crear respuesta (Profesor)
+PUT    /api/respuestas/:id                     # Actualizar respuesta (Profesor)
+DELETE /api/respuestas/:id                     # Eliminar respuesta (Profesor)
+
+PUT    /api/respuestas/pregunta/:id_pregunta/reordenar
+                                               # Reordenar respuestas (Profesor)
+```
+
+### Exámenes
+
+```
+POST   /api/examenes                     # Crear examen (Profesor)
+PUT    /api/examenes/:id                 # Actualizar examen (Profesor)
+DELETE /api/examenes/:id                 # Eliminar examen (Profesor)
+
+POST   /api/examenes/:id/preguntas       # Agregar pregunta a examen (Profesor)
+DELETE /api/examenes/:id/preguntas/:preguntaId
+                                         # Eliminar pregunta del examen (Profesor)
+
+GET    /api/examenes                     # Listar exámenes (Profesor / Admin)
+GET    /api/examenes/:id                 # Obtener examen por ID (Profesor / Admin)
+
 ```
 
 > **Nota**: Los endpoints protegidos requieren enviar el token JWT en el header:
@@ -679,6 +718,7 @@ GET http://localhost:4000/api/rangos-edad
 - ✅ Ver, editar, eliminar preguntas de cualquier profesor
 - ✅ Crear, editar, eliminar ciclos
 - ✅ Publicar/despublicar preguntas de cualquier profesor
+- ✅ Acceso de lectura a todos los exámenes
 - ✅ Acceso a estadísticas y reportes
 
 #### PROFESOR
@@ -687,6 +727,8 @@ GET http://localhost:4000/api/rangos-edad
 - ✅ Ver solo sus preguntas (borradores + publicadas)
 - ✅ Publicar/despublicar sus preguntas
 - ✅ Ver ciclos activos
+- ✅ Crear, editar y eliminar exámenes
+- ✅ Agregar y quitar preguntas a sus exámenes
 - ❌ No puede ver preguntas de otros profesores
 - ❌ No puede crear/editar ciclos
 
