@@ -8,6 +8,7 @@ const subcategoriaRoutes = require('./subcategoriaRoutes');
 const preguntaRoutes = require('./preguntaRoutes');
 const cicloRoutes = require('./cicloRoutes');
 const respuestaRoutes = require('./respuestaRoutes');
+const examenRoutes = require('./examenRoutes');
 const { verificarToken } = require("../middlewares/autenticacion");
 
 router.use("/auth", authRoutes);
@@ -20,6 +21,7 @@ router.use('/subcategorias', subcategoriaRoutes);  // Sin verificarToken aquí, 
 router.use('/preguntas', preguntaRoutes);  // Las protecciones están dentro de preguntaRoutes
 router.use('/ciclos', cicloRoutes);  // Las protecciones están dentro de cicloRoutes
 router.use('/respuestas', respuestaRoutes);
+router.use('/examenes', examenRoutes);
 // Ruta de prueba
 router.get('/test', (req, res) => {
     res.json({ message: '✅ Ruta de prueba funcionando' });
